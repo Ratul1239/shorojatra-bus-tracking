@@ -1,0 +1,361 @@
+/* =====================================================================
+   গ্লোবাল ডিজাইন সিস্টেম (Tailwind CSS v4 + কাস্টম কম্পোনেন্ট ক্লাস)
+   ---------------------------------------------------------------------
+   Django/Bootstrap প্রজেক্টে যেমন style.css থাকে, এখানে সেই ভূমিকায় এই ফাইল।
+   রঙ: গভীর নেভি-টিল বেস + মিন্ট অ্যাকসেন্ট + অ্যাম্বার হাইলাইট।
+   ===================================================================== */
+@import "tailwindcss";
+
+/* রঙ, টাইপোগ্রাফি ও spacing-এর একক জায়গায় সংজ্ঞা (থিম পরিবর্তন সহজ) */
+:root {
+  --bg: #050e15;
+  --surface: #0b1b26;
+  --surface-2: #102735;
+  --line: rgba(150, 202, 207, 0.14);
+  --line-strong: rgba(150, 202, 207, 0.28);
+  --text: #e9f5f4;
+  --muted: #8ba7ae;
+  --mint: #45dfb0;
+  --gold: #f5bd55;
+  --sky: #78c8f5;
+  --radius: 20px;
+}
+
+/* ডার্ক কালার-স্কিম: ব্রাউজারের নেটিভ কন্ট্রোলও থিমের সাথে মেলে */
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+/* বাংলা ও ইংরেজি দুটোতেই পড়ার উপযোগী ফন্ট স্ট্যাক (কোনো external fetch নেই) */
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(69, 223, 176, 0.11), transparent 62%),
+    radial-gradient(760px 480px at 92% 6%, rgba(120, 200, 245, 0.09), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Noto Sans Bengali", "Hind Siliguri", "SolaimanLipi", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* বাংলা লেখায় লাইনের উচ্চতা একটু বাড়াই, যেন যুক্তাক্ষর কেটে না যায় */
+:lang(bn) {
+  line-height: 1.75;
+}
+
+/* সব কার্ডে ব্যবহৃত কাঁচ-সদৃশ পৃষ্ঠ */
+.glass-card {
+  background: linear-gradient(160deg, rgba(19, 43, 57, 0.92), rgba(9, 24, 34, 0.92));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+/* হোমের পরিসংখ্যান বার: হিরোর ওপরে দৃশ্যমান, সুন্দর আলাদা ঘর ও নরম ছায়া। */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(150, 202, 207, 0.2);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 3% 0%, rgba(69, 223, 176, 0.08), transparent 35%),
+    linear-gradient(115deg, #102b35 0%, #10232f 55%, #0a1c27 100%);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* প্রতিটি ঘর যথেষ্ট padding পায়; min-width: 0 দীর্ঘ বাংলা/ইংরেজি লেখাকে ভেতরে রাখে। */
+.stats-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 20px;
+}
+
+/* মোবাইলে ২×২ গ্রিড: মাঝে অনুভূমিক ও উল্লম্ব বিভাজক। */
+.stats-item:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+.stats-item:nth-child(odd) { border-right: 1px solid var(--line); }
+
+/* আইকনের ছোট রঙিন পটভূমি কার্ডের তথ্য সহজে আলাদা করতে সাহায্য করে। */
+.stats-icon {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgba(69, 223, 176, 0.2);
+  border-radius: 14px;
+  background: rgba(69, 223, 176, 0.09);
+  color: var(--mint);
+}
+.stats-icon-gold {
+  border-color: rgba(245, 189, 85, 0.22);
+  background: rgba(245, 189, 85, 0.1);
+  color: var(--gold);
+}
+
+/* tight line-height না ব্যবহার করায় বাংলা অক্ষরের মাথা ও নিচের অংশ কাটা পড়ে না। */
+.stats-value {
+  font-size: clamp(1.25rem, 2.2vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  overflow-wrap: break-word;
+}
+.stats-label {
+  margin-top: 2px;
+  color: #a6c1c6;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+/* বড় স্ক্রিনে চারটি ঘর পাশাপাশি; পুরনো মোবাইল বিভাজক সরিয়ে নতুনগুলো বসাই। */
+@media (min-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stats-item { padding: 24px; }
+  .stats-item:nth-child(-n + 2) { border-bottom: 0; }
+  .stats-item:nth-child(odd) { border-right: 0; }
+  .stats-item:not(:last-child) { border-right: 1px solid var(--line); }
+}
+
+/* সরু ফোনে আইকন ও padding ছোট করে সব তথ্য কার্ডের ভেতরে রাখি। */
+@media (max-width: 420px) {
+  .stats-item { gap: 9px; padding: 18px 12px; }
+  .stats-icon { flex-basis: 36px; width: 36px; height: 36px; border-radius: 11px; }
+  .stats-icon svg { width: 18px; height: 18px; }
+  .stats-label { font-size: 0.7rem; }
+}
+
+/* ছোট প্যানেল: ম্যাপের পরিসংখ্যান, API প্রিভিউ ইত্যাদি */
+.panel {
+  background: rgba(8, 22, 31, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+/* ইনপুট ফিল্ড: focus হলে মিন্ট রঙের রিং (Bootstrap form-control-এর আধুনিক রূপ) */
+.input {
+  width: 100%;
+  background: rgba(6, 18, 27, 0.78);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 0.78rem 0.95rem;
+  color: var(--text);
+  font-size: 0.94rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.input::placeholder {
+  color: #65848d;
+}
+.input:focus {
+  border-color: rgba(69, 223, 176, 0.75);
+  box-shadow: 0 0 0 3px rgba(69, 223, 176, 0.14);
+  background: rgba(8, 24, 34, 0.95);
+}
+
+/* প্রধান বাটন: গ্রেডিয়েন্ট + সামান্য lift অ্যানিমেশন */
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  padding: 0.78rem 1.25rem;
+  font-weight: 650;
+  font-size: 0.92rem;
+  color: #04221a;
+  background: linear-gradient(120deg, #63e8bd, #2fc99b);
+  box-shadow: 0 8px 24px rgba(47, 201, 155, 0.22);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  white-space: nowrap;
+}
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(47, 201, 155, 0.32);
+  filter: brightness(1.05);
+}
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+/* সেকেন্ডারি বাটন: কেবল রেখা ও স্বচ্ছ ব্যাকগ্রাউন্ড */
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 12px;
+  padding: 0.72rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #cfe7e6;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.18s ease;
+}
+.ghost-btn:hover {
+  border-color: rgba(69, 223, 176, 0.6);
+  background: rgba(69, 223, 176, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ছোট তথ্য-চিপ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  border-radius: 999px;
+  padding: 0.22rem 0.62rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #b9d6d8;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+/* হিরো ছবির ওপরের গ্রেডিয়েন্ট: টেক্সট সবসময় পড়া যাবে */
+.hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(4, 14, 21, 0.97) 0%, rgba(4, 14, 21, 0.87) 38%, rgba(4, 14, 21, 0.32) 72%, rgba(4, 14, 21, 0.55) 100%),
+    linear-gradient(0deg, rgba(5, 14, 21, 1) 0%, transparent 45%);
+}
+
+/* ম্যাপের ব্যাকগ্রাউন্ড গ্রিড + সূক্ষ্ম রাস্তার টেক্সচার */
+.map-grid {
+  background-color: #071b24;
+  background-image:
+    linear-gradient(rgba(93, 168, 170, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(93, 168, 170, 0.075) 1px, transparent 1px),
+    radial-gradient(circle at 70% 20%, rgba(69, 223, 176, 0.08), transparent 45%);
+  background-size: 34px 34px, 34px 34px, 100% 100%;
+}
+
+/* লাইভ ডট: CSS pulse, JavaScript-এর প্রয়োজন নেই */
+.live-pulse {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 0 0 rgba(69, 223, 176, 0.55);
+  animation: pulse-ring 1.9s infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(69, 223, 176, 0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(69, 223, 176, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(69, 223, 176, 0); }
+}
+
+/* মার্কারের smooth গতি: left/top ১.২ সেকেন্ডে linearly interpolate হয় */
+.bus-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: left 1.2s linear, top 1.2s linear;
+  z-index: 20;
+}
+
+/* প্রথম রেন্ডারে কার্ডগুলোর নরম fade-up */
+.fade-up {
+  animation: fade-up 0.5s ease both;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* গ্রেডিয়েন্ট টেক্সট (হিরোর দ্বিতীয় লাইন) */
+.gradient-text {
+  background: linear-gradient(100deg, #7cf0c9 0%, #f5bd55 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* কোড/JSON ব্লকের মনোস্পেস ফন্ট */
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.7;
+}
+
+/* সরু স্ক্রলবার: স্টপ-ক্রম ও JSON প্রিভিউতে */
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: rgba(120, 200, 245, 0.25); border-radius: 99px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+
+/* ছোট স্ক্রিনে হেডার ও হিরোর অতিরিক্ত spacing কমানোর সহায়ক */
+@media (max-width: 640px) {
+  :root { --radius: 16px; }
+  .primary-btn, .ghost-btn { font-size: 0.82rem; padding: 0.68rem 0.9rem; }
+}
+
+/* =====================================================================
+   ৩D ম্যাপ: টুলবার বাটন ও মার্কারের স্টাইল (MapLibre + Google উভয়ে ব্যবহৃত)
+   ===================================================================== */
+
+/* ম্যাপের ওপরের ছোট নিয়ন্ত্রণ বাটন (৩D/২D, অনুসরণ, পুরো রুট) */
+.map-btn {
+  border-radius: 10px;
+  padding: 0.38rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #d9ecea;
+  background: rgba(4, 16, 23, 0.82);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(8px);
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.map-btn:hover {
+  border-color: rgba(69, 223, 176, 0.65);
+  color: #fff;
+}
+/* সক্রিয় অবস্থা: মিন্ট ব্যাকগ্রাউন্ড */
+.map-btn-on {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: #04221a;
+}
+
+/* স্টপের নাম-লেবেল (HTML মার্কার) */
+.m3d-stop {
+  background: rgba(4, 16, 23, 0.88);
+  color: #e9f5f4;
+  border: 1px solid rgba(69, 223, 176, 0.55);
+  border-radius: 7px;
+  padding: 1px 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.55;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+/* প্রান্তের (শুরু/গন্তব্য) লেবেল সোনালি */
+.m3d-stop-edge {
+  border-color: rgba(245, 189, 85, 0.85);
+  color: #ffe9b8;
+}
+
+/* বাসের নাম + পরবর্তী কাউন্টারের লেবেল */
+.m3d-bus-label {
+  background: var(--mint);
+  color: #04221a;
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(69, 223, 176, 0.25);
+}
+
+/* MapLibre-এর অ্যাট্রিবিউশন বাক্স থিমের সাথে মানানসই (লাইসেন্স-বাধ্যতামূলক, তাই লুকানো হয়নি) */
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
