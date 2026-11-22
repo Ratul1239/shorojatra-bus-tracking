@@ -25,10 +25,15 @@ export function computeLive(bus: CatalogBus, lang: Lang, nowMs: number): LiveDto
   const t = dictionary[lang]; // নির্বাচিত ভাষার লেবেল
   const route = bus.route; // বাসের রুট (আগে থেকে গণনা করা জ্যামিতিসহ)
 
-  // ফেজ: প্রতি বাসের নিজস্ব loopSeconds ও অফসেট ⇒ মার্কারগুলো একসাথে জমাট বাঁধে না।
-  const seconds = nowMs / 1000 + bus.tripStartMinute * 37;
-  const phase = (((seconds % bus.loopSeconds) + bus.loopSeconds) % bus.loopSeconds) / bus.loopSeconds;
+  // রুটের দূরত্ব ও বাসের বাস্তবসম্মত গতি থেকে trip duration নির্ধারণ করি।
+  // আগের bug: seed-এর loopSeconds (যেমন ৫৪০ সেকেন্ড) দিয়ে ৩০০+ km route
+  // কয়েক মিনিটে শেষ হয়ে যাচ্ছিল। loopSeconds এখন আর trip-এর গতি নিয়ন্ত্রণ করে না।
   const movingPart = 1 - DWELL_FRACTION; // চলমান অংশ (বাকিটা টার্মিনালে অপেক্ষা)
+  const cruiseSpeedKph = Math.max(25, bus.baseSpeedKph);
+  const movingSeconds = (route.totalKm / cruiseSpeedKph) * 3600;
+  const cycleSeconds = movingSeconds / movingPart;
+  const seconds = nowMs / 1000 + bus.tripStartMinute * 60;
+  const phase = (((seconds % cycleSeconds) + cycleSeconds) % cycleSeconds) / cycleSeconds;
   const atDestination = phase >= movingPart; // এখন গন্তব্যে দাঁড়িয়ে আছে কি না
   const progress = atDestination ? 1 : phase / movingPart; // ০ → ১ (শুধু সামনের দিকে)
   const travelledKm = progress * route.totalKm; // শুরু থেকে অতিক্রান্ত দূরত্ব
